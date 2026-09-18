@@ -1,0 +1,87 @@
+name: Scrape & Deploy
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  scrape-build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Ensure data directory
+        run: mkdir -p data
+
+      - name: Restore database
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/aewaittime.db
+            data/aewaittime.db-wal
+            data/aewaittime.db-shm
+          key: db-${{ github.run_id }}
+          restore-keys: db-
+
+      - name: Run scrapers
+        run: npx tsx scripts/scrape.ts
+
+      - name: Save database
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/aewaittime.db
+            data/aewaittime.db-wal
+            data/aewaittime.db-shm
+          key: db-${{ github.run_id }}
+
+      - name: Build static site
+        run: npm run build
+
+      # The hosting account has shell access disabled, so deployment is
+      # pure SFTP/scp — no remote commands. scp on the Ubuntu runner uses
+      # the SFTP protocol by default, which this account permits.
+      - name: Setup SSH key
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
+        run: |
+          set -euo pipefail
+          SSH_PORT="${CPANEL_SSH_PORT:-2239}"
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+
+          ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy to cPanel
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
+          CPANEL_TARGET_DIR: ${{ secrets.CPANEL_TARGET_DIR }}
+        run: |
+          set -euo pipefail
+          SSH_PORT="${CPANEL_SSH_PORT:-2239}"
+          TARGET="${CPANEL_TARGET_DIR}"
+
+          SSH_OPTS="-i $HOME/.ssh/id_deploy -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15"
+
+          shopt -s dotglob
+          scp $SSH_OPTS -P "$SSH_PORT" -r out/* "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
