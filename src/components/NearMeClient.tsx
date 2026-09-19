@@ -159,22 +159,7 @@ export function NearMeClient({ hospitals }: { hospitals: HospitalData[] }) {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
-      <nav className="text-xs font-semibold text-stone-400 mb-4 uppercase tracking-wide">
-        <Link href="/" className="hover:text-teal-700">Home</Link>
-        <span className="mx-1.5">/</span>
-        Near me
-      </nav>
-
-      <h1 className="text-3xl font-extrabold text-stone-900 tracking-tight mb-2">
-        Which A&amp;E Should I Head For?
-      </h1>
-      <p className="text-stone-500 mb-8 max-w-2xl">
-        Give us a rough position and we&apos;ll rank the fifteen closest
-        departments — distance on one side, latest queue figure on the other,
-        decision yours.
-      </p>
-
+    <div>
       {nearby.length === 0 && !loading && (
         <div className="rounded-2xl bg-slate-900 p-8 md:p-10">
           <div className="max-w-md mx-auto text-center">
