@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     description:
       "The latest A&E queue figures for NHS hospitals across the UK — live where trusts publish them. Check the wait near you before you travel.",
   },
+  verification: {
+    google: "6z8eo9e6eVk_ZLaaUlTjX_aIhi5gNgBfCquKWTcKLv4",
+  },
   robots: {
     index: true,
     follow: true,
