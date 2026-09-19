@@ -100,8 +100,57 @@ export default async function HospitalDetailPage({
   const imageUrl = getHospitalImage(slug) || hospital.image_url;
   const is24h = hospital.opening_hours?.includes("24");
 
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Hospital",
+      name: hospital.name,
+      url: `https://aewaittimes.co.uk/hospitals/${slug}/`,
+      ...(imageUrl ? { image: imageUrl } : {}),
+      ...(hospital.phone ? { telephone: hospital.phone } : {}),
+      ...(is24h ? { openingHours: "Mo-Su 00:00-24:00" } : {}),
+      address: {
+        "@type": "PostalAddress",
+        ...(hospital.address ? { streetAddress: hospital.address } : {}),
+        ...(hospital.city ? { addressLocality: hospital.city } : {}),
+        ...(hospital.postcode ? { postalCode: hospital.postcode } : {}),
+        addressCountry: "GB",
+      },
+      ...(hospital.lat !== null && hospital.lng !== null
+        ? {
+            geo: {
+              "@type": "GeoCoordinates",
+              latitude: hospital.lat,
+              longitude: hospital.lng,
+            },
+          }
+        : {}),
+      ...(hospital.trust_name
+        ? {
+            parentOrganization: {
+              "@type": "MedicalOrganization",
+              name: hospital.trust_name,
+            },
+          }
+        : {}),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://aewaittimes.co.uk/" },
+        { "@type": "ListItem", position: 2, name: "Live Waits", item: "https://aewaittimes.co.uk/hospitals/" },
+        { "@type": "ListItem", position: 3, name: hospital.name },
+      ],
+    },
+  ];
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       {/* Dark header band carrying the live figure */}
       <section className="bg-slate-900">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8 md:py-10">

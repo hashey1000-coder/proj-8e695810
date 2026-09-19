@@ -392,6 +392,22 @@ export default function HomePage() {
         </div>
         <FAQ />
       </section>
+
+      {/* Site-level structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "AEWaitTimes",
+            alternateName: "A&E Wait Times UK",
+            url: "https://aewaittimes.co.uk/",
+            description:
+              "Independent tracker of NHS A&E waiting times across the UK.",
+          }),
+        }}
+      />
     </div>
   );
 }

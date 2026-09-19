@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -40,6 +40,10 @@ export const metadata: Metadata = {
   // is inherited by every page, pointing them all at "/" and telling search
   // engines the whole site is a duplicate of the homepage. Each page sets its
   // own canonical instead.
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0f172a",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -37,8 +37,34 @@ export default async function GuidePage({
     .concat(GUIDES.filter((g) => g.slug !== slug && g.category !== guide.category))
     .slice(0, 3);
 
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: guide.title,
+      description: guide.description,
+      inLanguage: "en-GB",
+      mainEntityOfPage: `https://aewaittimes.co.uk/guides/${guide.slug}/`,
+      author: { "@type": "Organization", name: "AEWaitTimes", url: "https://aewaittimes.co.uk/" },
+      publisher: { "@type": "Organization", name: "AEWaitTimes", url: "https://aewaittimes.co.uk/" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://aewaittimes.co.uk/" },
+        { "@type": "ListItem", position: 2, name: "Guides", item: "https://aewaittimes.co.uk/guides/" },
+        { "@type": "ListItem", position: 3, name: guide.title },
+      ],
+    },
+  ];
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       {/* Title band */}
       <section className="bg-slate-900">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">

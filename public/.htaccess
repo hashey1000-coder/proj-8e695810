@@ -18,4 +18,8 @@ ErrorDocument 404 /404.html
   </FilesMatch>
   Header always set Strict-Transport-Security "max-age=31536000"
   Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  # Geolocation stays available to our own near-me page; everything else off.
+  Header always set Permissions-Policy "geolocation=(self), camera=(), microphone=(), payment=()"
 </IfModule>
