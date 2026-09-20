@@ -51,6 +51,27 @@ async function main() {
     if (res.changes > 0) console.log(`  Corrected ${c.slug}.${c.column} → ${c.value}`);
   }
 
+  // Trust "source" links rot as NHS trusts restructure their websites
+  // (link-health audit, Sept 2026). These are display-only links on
+  // hospital pages — the scraper feeds are configured separately.
+  const TRUST_SOURCE_CORRECTIONS: { trust: string; url: string }[] = [
+    // deep waiting-times pages removed by the trusts; homepages verified live
+    { trust: "Barts Health NHS Trust", url: "https://www.bartshealth.nhs.uk/" },
+    { trust: "East Kent Hospitals University NHS Foundation Trust", url: "https://www.ekhuft.nhs.uk/" },
+    { trust: "University Hospitals of North Midlands NHS Trust", url: "https://www.uhnm.nhs.uk/" }, // waittimes microsite returns 503
+    { trust: "University Hospitals Birmingham NHS Foundation Trust", url: "https://www.uhb.nhs.uk/" }, // old page soft-404s
+    // organisations that moved or merged
+    { trust: "University Hospitals of Leicester NHS Trust", url: "https://www.uhleicester.nhs.uk/" },
+    { trust: "Warrington and Halton Teaching Hospitals NHS Foundation Trust", url: "https://northcheshireandmersey.nhs.uk/urgent-and-emergency-care-wait-times/" },
+    { trust: "University Hospitals Coventry and Warwickshire NHS Trust", url: "https://www.uhcw.nhs.uk/live-waiting-times/" },
+  ];
+  for (const c of TRUST_SOURCE_CORRECTIONS) {
+    const res = db
+      .prepare("UPDATE trusts SET source_url = ?, updated_at = datetime('now') WHERE name = ? AND source_url != ?")
+      .run(c.url, c.trust, c.url);
+    if (res.changes > 0) console.log(`  Updated source link for ${c.trust}`);
+  }
+
   const results = await runAllScrapers();
 
   let totalUpdated = 0;
