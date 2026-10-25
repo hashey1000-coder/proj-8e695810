@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import type Database from "better-sqlite3";
 import { TRUST_ORG_CODES } from "../nhs-england-stats";
 import { fetchWithRetry } from "./generic";
@@ -86,6 +88,83 @@ function fiscalYearLabels(now: Date): string[] {
   ];
 }
 
+export const ENGLAND_SNAPSHOT_PATH = "data/england-monthly.json";
+
+export interface EnglandSnapshot {
+  period: string;
+  source: string;
+  trusts: Record<string, { avgWaitMinutes: number; pctWithin4h: number }>;
+}
+
+/**
+ * Fetch and parse the latest NHS England monthly SitRep. Returns null when
+ * the publication can't be reached (their edge refuses datacenter IPs, so
+ * this only succeeds from an ordinary connection — see
+ * scripts/refresh-england-stats.ts).
+ */
+export async function fetchEnglandMonthly(): Promise<EnglandSnapshot | null> {
+  for (const fy of fiscalYearLabels(new Date())) {
+    const pageUrl = `https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/ae-attendances-and-emergency-admissions-${fy}/`;
+    let html: string;
+    try {
+      const res = await fetchPublication(pageUrl);
+      if (!res.ok) continue;
+      html = res.body;
+    } catch {
+      continue;
+    }
+
+    const links = [...html.matchAll(/https:\/\/[^"']+\/(\w+)-(\d{4})-CSV-\w+\.csv/g)]
+      .map((m) => ({ url: m[0], month: MONTHS.indexOf(m[1]), year: parseInt(m[2]) }))
+      .filter((l) => l.month >= 0)
+      .sort((a, b) => b.year - a.year || b.month - a.month);
+    if (links.length === 0) continue;
+
+    const latest = links[0];
+    const csvRes = await fetchPublication(latest.url);
+    if (!csvRes.ok) continue;
+
+    const lines = csvRes.body.split("\n");
+    const header = lines[0].split(",").map((h) => h.trim());
+    const iCode = header.indexOf("Org Code");
+    const iAtt = header.findIndex((h) => /^A&E attendances Type 1$/i.test(h));
+    const iOver = header.findIndex((h) => /^Attendances over 4hrs Type 1$/i.test(h));
+    if (iCode < 0 || iAtt < 0 || iOver < 0) continue;
+
+    const trusts: EnglandSnapshot["trusts"] = {};
+    for (const line of lines.slice(1)) {
+      const cells = line.split(",");
+      const trustName = TRUST_ORG_CODES[cells[iCode]?.trim()];
+      if (!trustName) continue;
+      const total = parseInt(cells[iAtt]);
+      const over4h = parseInt(cells[iOver]);
+      if (!Number.isFinite(total) || !Number.isFinite(over4h) || total < 500) continue;
+      trusts[trustName] = {
+        avgWaitMinutes: Math.round(((total - over4h) * 90 + over4h * 360) / total),
+        pctWithin4h: Math.round(((total - over4h) / total) * 1000) / 10,
+      };
+    }
+    if (Object.keys(trusts).length === 0) continue;
+
+    return {
+      period: `${MONTHS[latest.month]} ${latest.year}`,
+      source: latest.url,
+      trusts,
+    };
+  }
+  return null;
+}
+
+function loadEnglandSnapshot(): EnglandSnapshot | null {
+  try {
+    const file = path.join(process.cwd(), ENGLAND_SNAPSHOT_PATH);
+    if (!fs.existsSync(file)) return null;
+    return JSON.parse(fs.readFileSync(file, "utf-8")) as EnglandSnapshot;
+  } catch {
+    return null;
+  }
+}
+
 export async function refreshEnglandMonthly(db: Database.Database): Promise<string> {
   const notes: string[] = [];
   for (const fy of fiscalYearLabels(new Date())) {
@@ -147,10 +226,25 @@ export async function refreshEnglandMonthly(db: Database.Database): Promise<stri
       upsert(db, "trust", trustName, avg, pct, period);
       updated++;
     }
-    if (updated > 0) return `England: ${period}, ${updated} trusts`;
+    if (updated > 0) return `England: ${period}, ${updated} trusts (live)`;
     notes.push(`${fy}: no matching trusts in CSV`);
   }
-  return `England: no update (${notes.join("; ") || "no reason recorded"})`;
+
+  // Live fetch unavailable (NHS England refuses datacenter IPs, which is
+  // the normal case in CI) — use the committed snapshot instead.
+  const snapshot = loadEnglandSnapshot();
+  if (!snapshot) {
+    return `England: no update (${notes.join("; ") || "no reason recorded"})`;
+  }
+  if (storedPeriod(db, "trust") === snapshot.period) {
+    return `England: ${snapshot.period} (current, from snapshot)`;
+  }
+  let fromFile = 0;
+  for (const [trustName, v] of Object.entries(snapshot.trusts)) {
+    upsert(db, "trust", trustName, v.avgWaitMinutes, v.pctWithin4h, snapshot.period);
+    fromFile++;
+  }
+  return `England: ${snapshot.period}, ${fromFile} trusts (snapshot)`;
 }
 
 // ---------- Scotland: PHS weekly open data ----------

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "scrape": "tsx scripts/scrape.ts"
+    "scrape": "tsx scripts/scrape.ts",
+    "refresh-stats": "tsx scripts/refresh-england-stats.ts"
   },
   "dependencies": {
     "@types/better-sqlite3": "^9.6.0",
