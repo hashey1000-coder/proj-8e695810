@@ -62,14 +62,19 @@ function fiscalYearLabels(now: Date): string[] {
 }
 
 export async function refreshEnglandMonthly(db: Database.Database): Promise<string> {
+  const notes: string[] = [];
   for (const fy of fiscalYearLabels(new Date())) {
     const pageUrl = `https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/ae-attendances-and-emergency-admissions-${fy}/`;
     let html: string;
     try {
       const res = await fetchWithRetry(pageUrl, { headers: { "User-Agent": UA } });
-      if (!res.ok) continue;
+      if (!res.ok) {
+        notes.push(`${fy}: page HTTP ${res.status}`);
+        continue;
+      }
       html = await res.text();
-    } catch {
+    } catch (err) {
+      notes.push(`${fy}: page fetch ${err instanceof Error ? err.message : err}`);
       continue;
     }
 
@@ -78,20 +83,29 @@ export async function refreshEnglandMonthly(db: Database.Database): Promise<stri
       .map((m) => ({ url: m[0], month: MONTHS.indexOf(m[1]), year: parseInt(m[2]) }))
       .filter((l) => l.month >= 0)
       .sort((a, b) => b.year - a.year || b.month - a.month);
-    if (links.length === 0) continue;
+    if (links.length === 0) {
+      notes.push(`${fy}: no CSV links on page (${html.length} bytes)`);
+      continue;
+    }
 
     const latest = links[0];
     const period = `${MONTHS[latest.month]} ${latest.year}`;
     if (storedPeriod(db, "trust") === period) return `England: ${period} (current)`;
 
     const csvRes = await fetchWithRetry(latest.url, { headers: { "User-Agent": UA } });
-    if (!csvRes.ok) continue;
+    if (!csvRes.ok) {
+      notes.push(`${fy}: CSV HTTP ${csvRes.status}`);
+      continue;
+    }
     const lines = (await csvRes.text()).split("\n");
     const header = lines[0].split(",").map((h) => h.trim());
     const iCode = header.indexOf("Org Code");
     const iAtt = header.findIndex((h) => /^A&E attendances Type 1$/i.test(h));
     const iOver = header.findIndex((h) => /^Attendances over 4hrs Type 1$/i.test(h));
-    if (iCode < 0 || iAtt < 0 || iOver < 0) continue;
+    if (iCode < 0 || iAtt < 0 || iOver < 0) {
+      notes.push(`${fy}: unexpected CSV columns`);
+      continue;
+    }
 
     let updated = 0;
     for (const line of lines.slice(1)) {
@@ -109,8 +123,9 @@ export async function refreshEnglandMonthly(db: Database.Database): Promise<stri
       updated++;
     }
     if (updated > 0) return `England: ${period}, ${updated} trusts`;
+    notes.push(`${fy}: no matching trusts in CSV`);
   }
-  return "England: no update";
+  return `England: no update (${notes.join("; ") || "no reason recorded"})`;
 }
 
 // ---------- Scotland: PHS weekly open data ----------
