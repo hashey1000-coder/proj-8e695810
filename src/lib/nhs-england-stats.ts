@@ -2,7 +2,7 @@
 // Source: NHS England Monthly A&E SitRep (August 2026)
 // Only England trusts — Scotland, Wales, NI have separate systems
 
-const TRUST_ORG_CODES: Record<string, string> = {
+export const TRUST_ORG_CODES: Record<string, string> = {
   R1H: "Barts Health NHS Trust",
   RA7: "University Hospitals Bristol and Weston NHS Foundation Trust",
   RGT: "Cambridge University Hospitals NHS Foundation Trust",

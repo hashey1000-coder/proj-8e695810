@@ -62,6 +62,16 @@ function initSchema(db: Database.Database) {
       freshness TEXT NOT NULL DEFAULT 'live'
     );
 
+    CREATE TABLE IF NOT EXISTS typical_waits (
+      key_type TEXT NOT NULL,        -- 'trust' (England monthly) or 'hospital' (Scotland weekly)
+      key TEXT NOT NULL,             -- trust name, or hospital slug
+      avg_wait_minutes INTEGER NOT NULL,
+      pct_within_4h REAL NOT NULL,
+      period TEXT NOT NULL,          -- e.g. 'September 2026' or '4 weeks to 2026-10-11'
+      updated_at TEXT DEFAULT (datetime('now')),
+      PRIMARY KEY (key_type, key)
+    );
+
     CREATE INDEX IF NOT EXISTS idx_hospitals_region ON hospitals(region);
     CREATE INDEX IF NOT EXISTS idx_hospitals_country ON hospitals(country);
     CREATE INDEX IF NOT EXISTS idx_hospitals_trust ON hospitals(trust_id);

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
-import { getTypicalWaitForTrust } from "@/lib/nhs-england-stats";
+import { getTypicalWait } from "@/lib/data/typical";
 import { NearMeClient } from "@/components/NearMeClient";
 
 export const metadata: Metadata = {
@@ -19,9 +19,7 @@ export default function NearMePage() {
     .filter((h) => h.lat !== null && h.lng !== null)
     .map((h) => {
       const typical =
-        h.wait_minutes === null && h.trust_name
-          ? getTypicalWaitForTrust(h.trust_name)
-          : null;
+        h.wait_minutes === null ? getTypicalWait(h.slug, h.trust_name) : null;
       return {
         id: h.id,
         name: h.name,

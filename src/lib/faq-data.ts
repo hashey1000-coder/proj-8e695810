@@ -12,7 +12,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Where does the data actually come from?",
     answer:
-      "Two places: the live waiting-time dashboards that individual NHS trusts run for their own patients (we collect from feeds in England, Scotland and Northern Ireland), and NHS England's monthly performance statistics, which we use to estimate typical waits for English trusts without a live feed. Every hospital page names its source trust and links to the original page. NHS Wales withdrew its live feed, so Welsh hospitals currently show no live figure.",
+      "Two kinds of source: the live waiting-time dashboards that individual NHS trusts run for their own patients (we collect from feeds in England, Scotland and Northern Ireland), and official performance statistics — NHS England's monthly release and Public Health Scotland's weekly hospital-level open data — which we use to estimate typical waits where no live feed exists. Every hospital page names its source trust and links to the original page. NHS Wales withdrew its live feed and publishes no open hospital-level figures we can use, so Welsh hospitals currently show no estimate.",
   },
   {
     question: "Does a short wait mean I'll definitely be seen quickly?",

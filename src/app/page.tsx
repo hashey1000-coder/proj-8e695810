@@ -349,7 +349,7 @@ export default function HomePage() {
               },
               {
                 title: "Official statistics fill the gaps",
-                body: "Where no live feed exists, we show estimated typical waits derived from NHS England's monthly performance statistics — always labelled as estimates, never dressed up as live data. Trusts without a feed or a statistical basis simply show no figure.",
+                body: "Where no live feed exists, we show estimated typical waits derived from official performance statistics — NHS England's monthly figures and Public Health Scotland's weekly hospital-level data — always labelled as estimates, never dressed up as live data. Where there's no statistical basis either, we simply show no figure.",
               },
               {
                 title: "Independent by design",

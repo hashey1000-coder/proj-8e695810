@@ -1,4 +1,5 @@
 import { runAllScrapers } from "../src/lib/scrapers";
+import { refreshOfficialStats } from "../src/lib/scrapers/official-stats";
 import { getDb } from "../src/lib/db";
 import fs from "fs";
 import path from "path";
@@ -71,6 +72,10 @@ async function main() {
       .run(c.url, c.trust, c.url);
     if (res.changes > 0) console.log(`  Updated source link for ${c.trust}`);
   }
+
+  // Official statistics (England monthly, Scotland weekly) feed the
+  // "estimated wait" fallbacks; cheap no-ops when already current.
+  await refreshOfficialStats(db);
 
   const results = await runAllScrapers();
 

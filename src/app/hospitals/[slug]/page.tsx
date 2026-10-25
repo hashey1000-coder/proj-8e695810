@@ -16,6 +16,7 @@ import {
   haversineDistance,
 } from "@/lib/utils";
 import { getHospitalImage } from "@/lib/hospital-images";
+import { getTypicalWait } from "@/lib/data/typical";
 import { HospitalHistory } from "@/components/HospitalHistory";
 import { TimeAgo } from "@/components/TimeAgo";
 import type { Metadata } from "next";
@@ -242,13 +243,36 @@ export default async function HospitalDetailPage({
               ) : (
                 <>
                   <p className="text-lg font-bold text-slate-300">No live feed</p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    {hospital.avg_wait !== null
-                      ? `Usual figure here: ~${formatWaitTime(hospital.avg_wait)}`
-                      : nationalAvg > 0
-                        ? `National average: ~${formatWaitTime(nationalAvg)}`
-                        : "Check back after the next data run"}
-                  </p>
+                  {(() => {
+                    const typical = getTypicalWait(slug, hospital.trust_name);
+                    if (hospital.avg_wait !== null) {
+                      return (
+                        <p className="text-xs text-slate-500 mt-1">
+                          Usual figure here: ~{formatWaitTime(hospital.avg_wait)}
+                        </p>
+                      );
+                    }
+                    if (typical) {
+                      return (
+                        <div className="text-xs text-slate-500 mt-1">
+                          <p>
+                            Estimated wait: ~{formatWaitTime(typical.avgWaitMinutes)}
+                          </p>
+                          <p className="mt-0.5">
+                            {typical.pctWithin4h}% done within 4 hrs ·{" "}
+                            {typical.period}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return (
+                      <p className="text-xs text-slate-500 mt-1">
+                        {nationalAvg > 0
+                          ? `National average: ~${formatWaitTime(nationalAvg)}`
+                          : "Check back after the next data run"}
+                      </p>
+                    );
+                  })()}
                 </>
               )}
               {(hospital.patients_waiting !== null || hospital.total_patients !== null) && (
