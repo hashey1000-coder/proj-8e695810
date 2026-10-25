@@ -11,11 +11,29 @@ concurrency:
   group: deploy
   cancel-in-progress: true
 
+# contents: write is needed by the keepalive step below
+permissions:
+  contents: write
+
 jobs:
   scrape-build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # GitHub disables cron schedules after 60 days without a commit.
+      # When the last commit is ~50 days old, push an empty one to reset
+      # the clock so the half-hourly scrape never silently stops.
+      - name: Keep scheduled workflow alive
+        if: github.event_name == 'schedule'
+        run: |
+          AGE_DAYS=$(( ( $(date +%s) - $(git log -1 --format=%ct) ) / 86400 ))
+          if [ "$AGE_DAYS" -ge 50 ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "chore: keepalive commit so the scheduled scrape stays enabled"
+            git push
+          fi
 
       - uses: actions/setup-node@v4
         with:

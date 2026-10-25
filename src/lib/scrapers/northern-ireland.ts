@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { getDb } from "../db";
 import { generateId, slugify } from "../utils";
+import { fetchWithRetry } from "./generic";
 
 const SOURCE_URL =
   "https://www.nidirect.gov.uk/articles/emergency-department-waiting-times";
@@ -15,7 +16,7 @@ export async function scrapeNorthernIreland(): Promise<{
   let hospitalsUpdated = 0;
 
   try {
-    const response = await fetch(SOURCE_URL, {
+    const response = await fetchWithRetry(SOURCE_URL, {
       headers: {
         "User-Agent":
           "AEWaitTimes/1.0 (+https://aewaittimes.co.uk; independent NHS wait time aggregator)",

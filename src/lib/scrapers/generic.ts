@@ -6,6 +6,30 @@ import type { SourceConfig, ParsedWaitTime } from "./sources";
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
 
+/**
+ * Trust sites occasionally drop a single connection ("fetch failed"),
+ * which used to cost a whole half-hour cycle for that source. Retry a
+ * couple of times with a short pause before giving up.
+ */
+export async function fetchWithRetry(
+  url: string,
+  init?: RequestInit,
+  attempts = 3
+): Promise<Response> {
+  let lastError: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fetch(url, init);
+    } catch (err) {
+      lastError = err;
+      if (i < attempts - 1) {
+        await new Promise((r) => setTimeout(r, 2000 * (i + 1)));
+      }
+    }
+  }
+  throw lastError;
+}
+
 export async function scrapeSource(config: SourceConfig): Promise<{
   success: boolean;
   hospitalsUpdated: number;
@@ -15,7 +39,7 @@ export async function scrapeSource(config: SourceConfig): Promise<{
   let hospitalsUpdated = 0;
 
   try {
-    const response = await fetch(config.sourceUrl, {
+    const response = await fetchWithRetry(config.sourceUrl, {
       headers: { "User-Agent": USER_AGENT },
     });
 
