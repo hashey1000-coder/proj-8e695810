@@ -22,3 +22,9 @@ Live NHS A&E waiting-time tracker ("AEWaitTimes"). Independent sister project of
 - `npm run dev` — dev server (port 3000)
 - `npm run build` — static export to `out/`
 - `npm run scrape` — refresh wait readings into SQLite
+
+## Official statistics sources
+Hospitals without a live feed show an "estimated wait" from official statistics (`typical_waits` table, refreshed during `npm run scrape`):
+- **Scotland** — Public Health Scotland weekly open data (CKAN API, hospital-level, latest 4 weeks). Fully automatic in CI. Site codes that don't name-match are mapped in `PHS_CODE_TO_SLUG` in `src/lib/scrapers/official-stats.ts`.
+- **England** — NHS England monthly SitRep CSV. Their edge blocks datacenter IPs, so CI can't fetch it; run `npm run refresh-stats` from an ordinary connection when a new month lands and commit `data/england-monthly.json`. CI tries live first, then falls back to that snapshot.
+- **Wales** — no usable open hospital-level feed (live feed decommissioned; StatsWales has no stable export endpoint). Welsh pages intentionally show no estimate.
