@@ -19,6 +19,31 @@ import { fetchWithRetry } from "./generic";
 const UA =
   "AEWaitTimes/1.0 (+https://aewaittimes.co.uk; independent NHS wait time aggregator)";
 
+// NHS England's edge serves an empty 200 to our honest bot UA from
+// datacenter IPs (works from a desktop, returns 0 bytes from CI). Identify
+// honestly first, and only fall back to a standard browser UA when the
+// response comes back blocked or empty.
+const BROWSER_UA =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+async function fetchPublication(
+  url: string
+): Promise<{ ok: boolean; status: number; body: string }> {
+  for (const ua of [UA, BROWSER_UA]) {
+    const res = await fetchWithRetry(url, {
+      headers: {
+        "User-Agent": ua,
+        Accept: "text/html,application/xhtml+xml,text/csv,*/*",
+        "Accept-Language": "en-GB,en;q=0.9",
+      },
+    });
+    const body = res.ok ? await res.text() : "";
+    if (res.ok && body.length > 0) return { ok: true, status: res.status, body };
+    if (ua === BROWSER_UA) return { ok: false, status: res.status, body };
+  }
+  return { ok: false, status: 0, body: "" };
+}
+
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -67,12 +92,12 @@ export async function refreshEnglandMonthly(db: Database.Database): Promise<stri
     const pageUrl = `https://www.england.nhs.uk/statistics/statistical-work-areas/ae-waiting-times-and-activity/ae-attendances-and-emergency-admissions-${fy}/`;
     let html: string;
     try {
-      const res = await fetchWithRetry(pageUrl, { headers: { "User-Agent": UA } });
+      const res = await fetchPublication(pageUrl);
       if (!res.ok) {
-        notes.push(`${fy}: page HTTP ${res.status}`);
+        notes.push(`${fy}: page HTTP ${res.status}, ${res.body.length} bytes`);
         continue;
       }
-      html = await res.text();
+      html = res.body;
     } catch (err) {
       notes.push(`${fy}: page fetch ${err instanceof Error ? err.message : err}`);
       continue;
@@ -92,12 +117,12 @@ export async function refreshEnglandMonthly(db: Database.Database): Promise<stri
     const period = `${MONTHS[latest.month]} ${latest.year}`;
     if (storedPeriod(db, "trust") === period) return `England: ${period} (current)`;
 
-    const csvRes = await fetchWithRetry(latest.url, { headers: { "User-Agent": UA } });
+    const csvRes = await fetchPublication(latest.url);
     if (!csvRes.ok) {
       notes.push(`${fy}: CSV HTTP ${csvRes.status}`);
       continue;
     }
-    const lines = (await csvRes.text()).split("\n");
+    const lines = csvRes.body.split("\n");
     const header = lines[0].split(",").map((h) => h.trim());
     const iCode = header.indexOf("Org Code");
     const iAtt = header.findIndex((h) => /^A&E attendances Type 1$/i.test(h));
