@@ -28,3 +28,6 @@ Hospitals without a live feed show an "estimated wait" from official statistics 
 - **Scotland** — Public Health Scotland weekly open data (CKAN API, hospital-level, latest 4 weeks). Fully automatic in CI. Site codes that don't name-match are mapped in `PHS_CODE_TO_SLUG` in `src/lib/scrapers/official-stats.ts`.
 - **England** — NHS England monthly SitRep CSV. Their edge blocks datacenter IPs, so CI can't fetch it; run `npm run refresh-stats` from an ordinary connection when a new month lands and commit `data/england-monthly.json`. CI tries live first, then falls back to that snapshot.
 - **Wales** — no usable open hospital-level feed (live feed decommissioned; StatsWales has no stable export endpoint). Welsh pages intentionally show no estimate.
+
+## Analytics
+Google Analytics 4 (`G-FF6T6W000G`) loads from `src/components/Analytics.tsx` via `next/script` (`afterInteractive`) in the root layout. The inline config strips `lat`, `lng` and `postcode` from the reported `page_location`/`page_referrer`: `/near-me/` carries the visitor's location in its query string, and the site promises never to store it. Keep that redaction if you touch the tag. Other params (e.g. `?q=`) are kept.
