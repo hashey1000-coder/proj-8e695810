@@ -46,7 +46,7 @@ export function HospitalHistory({
               <th className="pb-2 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Collected
               </th>
-              <th className="pb-2 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest w-[30%]">
+              <th className="hidden sm:table-cell pb-2 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest w-[30%]">
                 Trend
               </th>
               <th className="pb-2 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
@@ -55,7 +55,7 @@ export function HospitalHistory({
               <th className="pb-2 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Shift
               </th>
-              <th className="pb-2 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
+              <th className="hidden sm:table-cell pb-2 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Queue
               </th>
             </tr>
@@ -80,7 +80,7 @@ export function HospitalHistory({
                       {ukClockTime(r.scraped_at)}
                     </span>
                   </td>
-                  <td className="py-2.5 pr-3">
+                  <td className="hidden sm:table-cell py-2.5 pr-3">
                     {r.wait_minutes !== null && (
                       <div className="h-2 rounded-full bg-stone-100 overflow-hidden min-w-[60px]">
                         <div
@@ -114,7 +114,7 @@ export function HospitalHistory({
                       <span className="text-xs text-stone-300">—</span>
                     )}
                   </td>
-                  <td className="py-2.5 text-right text-stone-600">
+                  <td className="hidden sm:table-cell py-2.5 text-right text-stone-600">
                     {r.patients_waiting ?? r.total_patients ?? "—"}
                   </td>
                 </tr>

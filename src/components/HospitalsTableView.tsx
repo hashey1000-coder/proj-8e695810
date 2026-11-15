@@ -38,19 +38,19 @@ export function HospitalsTableView({
         <table className="w-full">
           <thead>
             <tr className="border-b-2 border-stone-200 bg-stone-50">
-              <th className="px-5 py-3 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
+              <th className="px-3 sm:px-5 py-3 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Department
               </th>
-              <th className="hidden sm:table-cell px-5 py-3 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
+              <th className="hidden sm:table-cell px-3 sm:px-5 py-3 text-left text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Region
               </th>
-              <th className="px-5 py-3 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
+              <th className="px-3 sm:px-5 py-3 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Wait
               </th>
-              <th className="hidden md:table-cell px-5 py-3 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
+              <th className="hidden md:table-cell px-3 sm:px-5 py-3 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 In queue
               </th>
-              <th className="px-5 py-3 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
+              <th className="px-3 sm:px-5 py-3 text-right text-[11px] font-extrabold text-stone-500 uppercase tracking-widest">
                 Status
               </th>
             </tr>
@@ -60,7 +60,7 @@ export function HospitalsTableView({
               const severity = waitSeverity(hospital.wait_minutes);
               return (
                 <tr key={hospital.id} className="hover:bg-teal-50/40 transition-colors">
-                  <td className="px-5 py-3.5">
+                  <td className="px-3 sm:px-5 py-3.5">
                     <Link
                       href={`/hospitals/${hospital.slug}`}
                       className="text-sm font-bold text-stone-900 hover:text-teal-700"
@@ -72,10 +72,10 @@ export function HospitalsTableView({
                       {hospital.type !== "AE" ? ` · ${hospital.type}` : ""}
                     </p>
                   </td>
-                  <td className="hidden sm:table-cell px-5 py-3.5 text-sm text-stone-600">
+                  <td className="hidden sm:table-cell px-3 sm:px-5 py-3.5 text-sm text-stone-600">
                     {hospital.region}
                   </td>
-                  <td className="px-5 py-3.5 text-right">
+                  <td className="px-3 sm:px-5 py-3.5 text-right">
                     {hospital.wait_minutes !== null ? (
                       <span className="text-sm font-extrabold text-stone-900 whitespace-nowrap">
                         {formatWaitTime(hospital.wait_minutes)}
@@ -90,10 +90,10 @@ export function HospitalsTableView({
                       </span>
                     )}
                   </td>
-                  <td className="hidden md:table-cell px-5 py-3.5 text-right text-sm text-stone-600">
+                  <td className="hidden md:table-cell px-3 sm:px-5 py-3.5 text-right text-sm text-stone-600">
                     {hospital.patients_waiting ?? hospital.total_patients ?? "—"}
                   </td>
-                  <td className="px-5 py-3.5 text-right">
+                  <td className="px-3 sm:px-5 py-3.5 text-right">
                     <span
                       className={`inline-block px-2 py-1 rounded-md text-[10px] font-extrabold uppercase tracking-wide ${severityPill(severity)}`}
                     >
