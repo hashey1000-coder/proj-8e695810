@@ -91,6 +91,13 @@ jobs:
 
           ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
+      # Install lftp for parallel SFTP upload. A plain `scp -r` opens a
+      # fresh round-trip per file, so uploading ~1,200 small static-export
+      # files serially takes ~5 min even though the payload is only ~35 MB.
+      # lftp mirrors with many concurrent transfers, cutting it to ~1 min.
+      - name: Install lftp
+        run: command -v lftp >/dev/null || sudo apt-get install -y --no-install-recommends lftp
+
       - name: Deploy to cPanel
         env:
           CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
@@ -102,7 +109,23 @@ jobs:
           SSH_PORT="${CPANEL_SSH_PORT:-2239}"
           TARGET="${CPANEL_TARGET_DIR}"
 
-          SSH_OPTS="-i $HOME/.ssh/id_deploy -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15"
+          # Key auth over SFTP via a custom connect-program; known_hosts was
+          # populated by the "Setup SSH key" step above.
+          SSH_CMD="ssh -a -x -p $SSH_PORT -i $HOME/.ssh/id_deploy -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
 
-          shopt -s dotglob
-          scp $SSH_OPTS -P "$SSH_PORT" -r out/* "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
+          # mirror -R uploads local -> remote. No --delete, so this matches the
+          # old scp behaviour (overwrite/add, never remove remote files). lftp
+          # re-uploads a file only when it's missing or differs, and always
+          # errs toward uploading, so it never leaves stale content.
+          lftp -u "$CPANEL_USER," "sftp://$CPANEL_HOST" <<LFTP
+          set sftp:connect-program "$SSH_CMD"
+          set sftp:auto-confirm yes
+          set cmd:fail-exit yes
+          set net:timeout 20
+          set net:max-retries 3
+          set net:reconnect-interval-base 5
+          set mirror:parallel-transfer-count 10
+          set mirror:use-pget-n 1
+          mirror -R --verbose out/ "$TARGET/"
+          bye
+          LFTP
