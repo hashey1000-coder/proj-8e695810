@@ -62,15 +62,18 @@ export function WeeklyHeatmap({ pattern }: { pattern: WeeklyPattern }) {
         </div>
       )}
 
-      <div className="overflow-x-auto -mx-4 px-4">
+      <div>
         <p className="sr-only">
           Average A&amp;E wait by day of the week and hour of the day, based on
           readings collected over the past weeks. Calmest around{" "}
           {pattern.quietest ? slot(pattern.quietest.day, pattern.quietest.hour) : "—"}, busiest around{" "}
           {pattern.busiest ? slot(pattern.busiest.day, pattern.busiest.hour) : "—"}.
         </p>
-        <div className="min-w-[640px]">
-          <div className="grid gap-[3px]" style={{ gridTemplateColumns: "44px repeat(24, 1fr)" }}>
+        <div className="min-w-0">
+          <div
+            className="grid gap-[2px] sm:gap-[3px]"
+            style={{ gridTemplateColumns: "34px repeat(24, minmax(0, 1fr))" }}
+          >
             <div />
             {HOURS.map((h) => (
               <div key={`h-${h}`} className="text-[10px] font-semibold text-stone-400 text-center pb-1">
@@ -110,7 +113,7 @@ export function WeeklyHeatmap({ pattern }: { pattern: WeeklyPattern }) {
               <span className="w-5 h-3.5 rounded-sm bg-rose-500" />
             </div>
             <span>Busier</span>
-            <span className="ml-auto font-normal text-stone-400">hour of day →</span>
+            <span className="ml-auto font-normal text-stone-400 hidden sm:inline">hour of day →</span>
           </div>
         </div>
       </div>

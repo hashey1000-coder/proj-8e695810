@@ -83,7 +83,7 @@ export default function HomePage() {
                 )}
               </p>
 
-              <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-[1.1]">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-[1.1]">
                 Know the A&amp;E queue{" "}
                 <span className="text-teal-400">before you leave the house</span>
               </h1>
@@ -99,8 +99,10 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* National snapshot panel */}
-            <div className="lg:col-span-2">
+            {/* National snapshot panel — hidden on mobile/tablet so the hero
+                carries the top of the page; the same figures live in the
+                "queue league" section below and on /statistics. */}
+            <div className="hidden lg:block lg:col-span-2">
               <div className="rounded-2xl bg-slate-800/70 backdrop-blur border border-slate-700 p-6">
                 <div className="flex items-center justify-between mb-5">
                   <h2 className="text-sm font-extrabold text-white uppercase tracking-wider">

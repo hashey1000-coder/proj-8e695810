@@ -29,15 +29,18 @@ function demandColor(value: number): string {
 
 export function DemandHeatmap() {
   return (
-    <div className="overflow-x-auto -mx-4 px-4">
+    <div>
       {/* Screen-reader alternative to the visual grid */}
       <p className="sr-only">
         Typical weekly A&amp;E demand pattern: departments are calmest between
         6am and 9am every day, busiest on Monday mornings, on weekday evenings
         from 6pm, and especially on Friday and Saturday nights.
       </p>
-      <div className="min-w-[640px]">
-        <div className="grid gap-[3px]" style={{ gridTemplateColumns: "44px repeat(24, 1fr)" }}>
+      <div className="min-w-0">
+        <div
+          className="grid gap-[2px] sm:gap-[3px]"
+          style={{ gridTemplateColumns: "34px repeat(24, minmax(0, 1fr))" }}
+        >
           {[
             <div key="corner" />,
             ...HOURS.map((h) => (
@@ -74,7 +77,7 @@ export function DemandHeatmap() {
             <span className="w-5 h-3.5 rounded-sm bg-rose-500" />
           </div>
           <span>Crowded</span>
-          <span className="ml-auto font-normal text-stone-400">hour of day →</span>
+          <span className="ml-auto font-normal text-stone-400 hidden sm:inline">hour of day →</span>
         </div>
       </div>
     </div>
