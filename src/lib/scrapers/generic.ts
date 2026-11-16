@@ -2,6 +2,7 @@ import * as cheerio from "cheerio";
 import { getDb } from "../db";
 import { generateId, slugify } from "../utils";
 import type { SourceConfig, ParsedWaitTime } from "./sources";
+import { validateReading } from "./validate";
 
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -82,6 +83,11 @@ export async function scrapeSource(config: SourceConfig): Promise<{
 
     for (const p of parsed) {
       try {
+        const check = validateReading(p);
+        if (!check.ok) {
+          errors.push(`${p.hospitalName}: rejected ${check.reason}`);
+          continue;
+        }
         const hospitalId = ensureHospital(db, p, config, trustId);
         db.prepare(
           `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, total_patients, source_timestamp, freshness)

@@ -11,6 +11,8 @@ import { formatWaitTime } from "@/lib/utils";
 import { WaitRow } from "@/components/WaitRow";
 import { SearchBar } from "@/components/SearchBar";
 import { DemandHeatmap } from "@/components/DemandHeatmap";
+import { WeeklyHeatmap } from "@/components/WeeklyHeatmap";
+import { getWeeklyPattern } from "@/lib/data/history";
 import { FAQ } from "@/components/FAQ";
 import { TimeAgo } from "@/components/TimeAgo";
 
@@ -29,6 +31,7 @@ export default function HomePage() {
   const quickest = getShortestWaits(5);
   const regions = getRegions();
   const stats = getNationalStats();
+  const nationalPattern = getWeeklyPattern();
 
   const withData = allHospitals.filter((h) => h.wait_minutes !== null);
   // Most recent reading across all reporting hospitals (the list is
@@ -313,8 +316,9 @@ export default function HomePage() {
                 When the waiting room fills up
               </h2>
               <p className="mt-1 text-stone-500 text-sm max-w-2xl">
-                A week of typical national demand, hour by hour. The teal patches —
-                early mornings especially — are when departments breathe easiest.
+                {nationalPattern.sufficient
+                  ? "A week of waits, hour by hour — averaged from every reading we've collected across the UK. The teal patches, early mornings especially, are when departments breathe easiest."
+                  : "A week of typical national demand, hour by hour. The teal patches — early mornings especially — are when departments breathe easiest."}
               </p>
             </div>
             <Link
@@ -324,7 +328,11 @@ export default function HomePage() {
               read the timing guide →
             </Link>
           </div>
-          <DemandHeatmap />
+          {nationalPattern.sufficient ? (
+            <WeeklyHeatmap pattern={nationalPattern} />
+          ) : (
+            <DemandHeatmap />
+          )}
         </div>
       </section>
 

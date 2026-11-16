@@ -1,194 +1,202 @@
 {
-  "period": "September 2026",
-  "source": "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2026/10/September-2026-CSV-Re72Eh.csv",
+  "period": "October 2026",
+  "source": "https://www.england.nhs.uk/statistics/wp-content/uploads/sites/2/2026/11/October-2026-CSV-WD35qg.csv",
   "trusts": {
-    "Mid Cheshire Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 226,
-      "pctWithin4h": 49.7
-    },
-    "University College London Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 161,
-      "pctWithin4h": 73.8
-    },
-    "University Hospitals Sussex NHS Foundation Trust": {
-      "avgWaitMinutes": 206,
-      "pctWithin4h": 57.2
+    "Maidstone and Tunbridge Wells NHS Trust": {
+      "avgWaitMinutes": 158,
+      "pctWithin4h": 74.9
     },
     "University Hospitals Plymouth NHS Trust": {
-      "avgWaitMinutes": 191,
-      "pctWithin4h": 62.6
-    },
-    "Royal Cornwall Hospitals NHS Trust": {
-      "avgWaitMinutes": 233,
-      "pctWithin4h": 47.2
-    },
-    "Wye Valley NHS Trust": {
-      "avgWaitMinutes": 201,
-      "pctWithin4h": 59
-    },
-    "University Hospitals of Morecambe Bay NHS Foundation Trust": {
-      "avgWaitMinutes": 198,
-      "pctWithin4h": 59.9
-    },
-    "Worcestershire Acute Hospitals NHS Trust": {
-      "avgWaitMinutes": 217,
-      "pctWithin4h": 52.8
-    },
-    "Manchester University NHS Foundation Trust": {
-      "avgWaitMinutes": 201,
-      "pctWithin4h": 59
-    },
-    "Torbay and South Devon NHS Foundation Trust": {
-      "avgWaitMinutes": 199,
-      "pctWithin4h": 59.6
-    },
-    "Liverpool University Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 231,
-      "pctWithin4h": 47.8
-    },
-    "Cambridge University Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 215,
-      "pctWithin4h": 53.6
-    },
-    "University Hospitals of North Midlands NHS Trust": {
-      "avgWaitMinutes": 238,
-      "pctWithin4h": 45.3
-    },
-    "North Cumbria Integrated Care NHS Foundation Trust": {
-      "avgWaitMinutes": 222,
-      "pctWithin4h": 51.2
-    },
-    "Leeds Teaching Hospitals NHS Trust": {
-      "avgWaitMinutes": 193,
-      "pctWithin4h": 61.8
-    },
-    "University Hospitals Birmingham NHS Foundation Trust": {
-      "avgWaitMinutes": 205,
-      "pctWithin4h": 57.3
-    },
-    "Sandwell and West Birmingham NHS Trust": {
-      "avgWaitMinutes": 206,
-      "pctWithin4h": 56.9
-    },
-    "East Lancashire Hospitals NHS Trust": {
-      "avgWaitMinutes": 191,
-      "pctWithin4h": 62.5
-    },
-    "The Shrewsbury and Telford Hospital NHS Trust": {
-      "avgWaitMinutes": 243,
-      "pctWithin4h": 43.2
-    },
-    "Guy's and St Thomas' NHS Foundation Trust": {
-      "avgWaitMinutes": 195,
-      "pctWithin4h": 61.2
-    },
-    "Whittington Health NHS Trust": {
-      "avgWaitMinutes": 165,
-      "pctWithin4h": 72.1
-    },
-    "Northampton General Hospital NHS Trust": {
-      "avgWaitMinutes": 210,
-      "pctWithin4h": 55.6
-    },
-    "The Newcastle upon Tyne Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 208,
-      "pctWithin4h": 56.1
-    },
-    "Barts Health NHS Trust": {
-      "avgWaitMinutes": 195,
-      "pctWithin4h": 61
-    },
-    "University Hospitals Bristol and Weston NHS Foundation Trust": {
-      "avgWaitMinutes": 177,
-      "pctWithin4h": 67.8
-    },
-    "Milton Keynes University Hospital NHS Foundation Trust": {
-      "avgWaitMinutes": 222,
-      "pctWithin4h": 51.2
-    },
-    "Sheffield Teaching Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 231,
-      "pctWithin4h": 47.8
-    },
-    "Lewisham and Greenwich NHS Trust": {
-      "avgWaitMinutes": 241,
-      "pctWithin4h": 44.1
-    },
-    "University Hospitals Coventry and Warwickshire NHS Trust": {
       "avgWaitMinutes": 196,
       "pctWithin4h": 60.7
     },
-    "Norfolk and Norwich University Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 176,
-      "pctWithin4h": 68
+    "University College London Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 167,
+      "pctWithin4h": 71.5
+    },
+    "Mid Cheshire Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 227,
+      "pctWithin4h": 49.4
+    },
+    "Wye Valley NHS Trust": {
+      "avgWaitMinutes": 194,
+      "pctWithin4h": 61.4
+    },
+    "Worcestershire Acute Hospitals NHS Trust": {
+      "avgWaitMinutes": 222,
+      "pctWithin4h": 51.1
+    },
+    "East Lancashire Hospitals NHS Trust": {
+      "avgWaitMinutes": 183,
+      "pctWithin4h": 65.7
+    },
+    "Torbay and South Devon NHS Foundation Trust": {
+      "avgWaitMinutes": 185,
+      "pctWithin4h": 65
+    },
+    "University Hospitals Coventry and Warwickshire NHS Trust": {
+      "avgWaitMinutes": 191,
+      "pctWithin4h": 62.7
+    },
+    "Northampton General Hospital NHS Trust": {
+      "avgWaitMinutes": 216,
+      "pctWithin4h": 53.2
+    },
+    "Royal Cornwall Hospitals NHS Trust": {
+      "avgWaitMinutes": 223,
+      "pctWithin4h": 50.8
+    },
+    "University Hospitals of North Midlands NHS Trust": {
+      "avgWaitMinutes": 244,
+      "pctWithin4h": 43
     },
     "University Hospitals of Derby and Burton NHS Foundation Trust": {
-      "avgWaitMinutes": 219,
-      "pctWithin4h": 52.2
+      "avgWaitMinutes": 223,
+      "pctWithin4h": 50.7
     },
-    "East Kent Hospitals University NHS Foundation Trust": {
-      "avgWaitMinutes": 222,
-      "pctWithin4h": 50.9
-    },
-    "Maidstone and Tunbridge Wells NHS Trust": {
-      "avgWaitMinutes": 164,
-      "pctWithin4h": 72.5
+    "University Hospitals of Morecambe Bay NHS Foundation Trust": {
+      "avgWaitMinutes": 201,
+      "pctWithin4h": 59
     },
     "North Cheshire and Mersey NHS Foundation Trust": {
-      "avgWaitMinutes": 213,
-      "pctWithin4h": 54.3
+      "avgWaitMinutes": 223,
+      "pctWithin4h": 50.9
     },
-    "Nottingham University Hospitals NHS Trust": {
-      "avgWaitMinutes": 240,
-      "pctWithin4h": 44.6
+    "University Hospitals Sussex NHS Foundation Trust": {
+      "avgWaitMinutes": 210,
+      "pctWithin4h": 55.5
     },
-    "Imperial College Healthcare NHS Trust": {
-      "avgWaitMinutes": 205,
-      "pctWithin4h": 57.3
+    "Manchester University NHS Foundation Trust": {
+      "avgWaitMinutes": 206,
+      "pctWithin4h": 57.2
     },
-    "University Hospital Southampton NHS Foundation Trust": {
-      "avgWaitMinutes": 176,
-      "pctWithin4h": 68
-    },
-    "Royal Berkshire NHS Foundation Trust": {
-      "avgWaitMinutes": 193,
-      "pctWithin4h": 61.8
-    },
-    "St George's University Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 169,
-      "pctWithin4h": 70.7
-    },
-    "Chelsea and Westminster Hospital NHS Foundation Trust": {
-      "avgWaitMinutes": 166,
-      "pctWithin4h": 71.8
-    },
-    "Epsom and St Helier University Hospitals NHS Trust": {
-      "avgWaitMinutes": 178,
-      "pctWithin4h": 67.3
+    "Cambridge University Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 225,
+      "pctWithin4h": 49.8
     },
     "King's College Hospital NHS Foundation Trust": {
       "avgWaitMinutes": 220,
       "pctWithin4h": 51.7
     },
+    "North Cumbria Integrated Care NHS Foundation Trust": {
+      "avgWaitMinutes": 210,
+      "pctWithin4h": 55.7
+    },
+    "Leeds Teaching Hospitals NHS Trust": {
+      "avgWaitMinutes": 194,
+      "pctWithin4h": 61.6
+    },
+    "The Newcastle upon Tyne Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 210,
+      "pctWithin4h": 55.4
+    },
     "Gloucestershire Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 193,
-      "pctWithin4h": 61.8
+      "avgWaitMinutes": 191,
+      "pctWithin4h": 62.5
+    },
+    "East Kent Hospitals University NHS Foundation Trust": {
+      "avgWaitMinutes": 222,
+      "pctWithin4h": 51.1
+    },
+    "University Hospitals of Leicester NHS Trust": {
+      "avgWaitMinutes": 201,
+      "pctWithin4h": 58.9
+    },
+    "Sandwell and West Birmingham NHS Trust": {
+      "avgWaitMinutes": 202,
+      "pctWithin4h": 58.5
+    },
+    "The Shrewsbury and Telford Hospital NHS Trust": {
+      "avgWaitMinutes": 242,
+      "pctWithin4h": 43.8
+    },
+    "Imperial College Healthcare NHS Trust": {
+      "avgWaitMinutes": 212,
+      "pctWithin4h": 54.6
+    },
+    "University Hospitals Bristol and Weston NHS Foundation Trust": {
+      "avgWaitMinutes": 179,
+      "pctWithin4h": 67.2
+    },
+    "Milton Keynes University Hospital NHS Foundation Trust": {
+      "avgWaitMinutes": 217,
+      "pctWithin4h": 53.1
+    },
+    "Liverpool University Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 229,
+      "pctWithin4h": 48.6
+    },
+    "Sheffield Teaching Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 226,
+      "pctWithin4h": 49.6
+    },
+    "Guy's and St Thomas' NHS Foundation Trust": {
+      "avgWaitMinutes": 192,
+      "pctWithin4h": 62.4
+    },
+    "Lewisham and Greenwich NHS Trust": {
+      "avgWaitMinutes": 234,
+      "pctWithin4h": 46.8
     },
     "Croydon Health Services NHS Trust": {
-      "avgWaitMinutes": 190,
-      "pctWithin4h": 63.1
+      "avgWaitMinutes": 193,
+      "pctWithin4h": 62
     },
-    "Lancashire Teaching Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 178,
-      "pctWithin4h": 67.4
+    "St George's University Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 166,
+      "pctWithin4h": 71.7
     },
-    "Oxford University Hospitals NHS Foundation Trust": {
-      "avgWaitMinutes": 164,
-      "pctWithin4h": 72.6
+    "Whittington Health NHS Trust": {
+      "avgWaitMinutes": 157,
+      "pctWithin4h": 75.2
+    },
+    "University Hospitals Birmingham NHS Foundation Trust": {
+      "avgWaitMinutes": 209,
+      "pctWithin4h": 55.8
     },
     "United Lincolnshire Teaching Hospitals NHS Trust": {
-      "avgWaitMinutes": 188,
-      "pctWithin4h": 63.6
+      "avgWaitMinutes": 190,
+      "pctWithin4h": 62.9
+    },
+    "Nottingham University Hospitals NHS Trust": {
+      "avgWaitMinutes": 236,
+      "pctWithin4h": 46
+    },
+    "Lancashire Teaching Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 167,
+      "pctWithin4h": 71.5
+    },
+    "Barts Health NHS Trust": {
+      "avgWaitMinutes": 189,
+      "pctWithin4h": 63.3
+    },
+    "University Hospital Southampton NHS Foundation Trust": {
+      "avgWaitMinutes": 186,
+      "pctWithin4h": 64.4
+    },
+    "Royal Berkshire NHS Foundation Trust": {
+      "avgWaitMinutes": 191,
+      "pctWithin4h": 62.6
+    },
+    "Norfolk and Norwich University Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 182,
+      "pctWithin4h": 66
+    },
+    "Chelsea and Westminster Hospital NHS Foundation Trust": {
+      "avgWaitMinutes": 170,
+      "pctWithin4h": 70.5
+    },
+    "Epsom and St Helier University Hospitals NHS Trust": {
+      "avgWaitMinutes": 182,
+      "pctWithin4h": 66.1
+    },
+    "Oxford University Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 163,
+      "pctWithin4h": 72.9
+    },
+    "Sherwood Forest Hospitals NHS Foundation Trust": {
+      "avgWaitMinutes": 184,
+      "pctWithin4h": 65
     }
   }
 }

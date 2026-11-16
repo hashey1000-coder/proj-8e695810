@@ -4,8 +4,10 @@ import {
   getLongestWaits,
   getShortestWaits,
 } from "@/lib/data/hospitals";
+import { getNationalTrendSummary, getRecords } from "@/lib/data/history";
 import { formatWaitTime } from "@/lib/utils";
 import { WaitRow } from "@/components/WaitRow";
+import { TrendChart } from "@/components/TrendChart";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,6 +21,15 @@ export default function StatisticsPage() {
   const stats = getNationalStats();
   const longest = getLongestWaits(10);
   const shortest = getShortestWaits(10);
+  const trend = getNationalTrendSummary(30);
+  const records = getRecords();
+
+  const fmtWhen = (ts: string) =>
+    new Date(ts.replace(" ", "T") + "Z").toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      timeZone: "Europe/London",
+    });
 
   const pctUnder30 =
     stats.reporting > 0 ? Math.round((stats.under30 / stats.reporting) * 100) : 0;
@@ -175,6 +186,39 @@ export default function StatisticsPage() {
           </div>
         </div>
 
+        {/* National trend */}
+        {trend.points.length >= 2 && (
+          <div className="rounded-xl border border-stone-200 bg-white p-6 md:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-1">
+              <h2 className="text-xl font-extrabold text-stone-900 tracking-tight">
+                The national wait, day by day
+              </h2>
+              {trend.deltaPct !== null && (
+                <span
+                  className={`text-sm font-bold ${
+                    trend.deltaPct > 0
+                      ? "text-rose-600"
+                      : trend.deltaPct < 0
+                        ? "text-emerald-600"
+                        : "text-stone-500"
+                  }`}
+                >
+                  {trend.deltaPct > 0 ? "▲" : trend.deltaPct < 0 ? "▼" : "→"}{" "}
+                  {Math.abs(trend.deltaPct)}% vs the week before
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-stone-500 mb-6">
+              Mean wait across all reporting departments, averaged by day over the
+              last {trend.points.length} days.
+              {trend.current !== null && (
+                <> This week it&apos;s averaging {formatWaitTime(trend.current)}.</>
+              )}
+            </p>
+            <TrendChart points={trend.points} height={200} />
+          </div>
+        )}
+
         {/* Patients waiting */}
         {stats.totalPatientsWaiting > 0 && (
           <div className="rounded-xl border border-stone-200 bg-white p-6 md:p-8 flex flex-col sm:flex-row sm:items-center gap-5 border-l-4 border-l-teal-600">
@@ -217,6 +261,60 @@ export default function StatisticsPage() {
             ))}
           </div>
         </div>
+
+        {/* All-time records */}
+        {(records.longestEver || records.busiestEver) && records.coverageDays >= 3 && (
+          <div className="rounded-xl border border-stone-200 bg-white p-6 md:p-8">
+            <h2 className="text-xl font-extrabold text-stone-900 tracking-tight mb-1">
+              On the record
+            </h2>
+            <p className="text-sm text-stone-500 mb-6">
+              The extremes we&apos;ve logged across {records.coverageDays} days and{" "}
+              {records.totalReadings.toLocaleString()} readings
+              {records.firstReading && <> since {fmtWhen(records.firstReading)}</>}.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {records.longestEver && (
+                <div className="rounded-xl border-l-4 border-l-rose-500 bg-rose-50/50 p-5">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-rose-700">
+                    Longest wait recorded
+                  </p>
+                  <p className="text-3xl font-extrabold text-stone-900 mt-1">
+                    {formatWaitTime(records.longestEver.minutes)}
+                  </p>
+                  <Link
+                    href={`/hospitals/${records.longestEver.slug}`}
+                    className="text-xs text-stone-600 hover:text-teal-700 underline underline-offset-2 mt-1 block truncate"
+                  >
+                    {records.longestEver.name}
+                  </Link>
+                  <p className="text-[11px] text-stone-400 mt-0.5">
+                    {fmtWhen(records.longestEver.when)}
+                  </p>
+                </div>
+              )}
+              {records.busiestEver && (
+                <div className="rounded-xl border-l-4 border-l-teal-600 bg-teal-50/50 p-5">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-teal-700">
+                    Most people queueing at once
+                  </p>
+                  <p className="text-3xl font-extrabold text-stone-900 mt-1">
+                    {records.busiestEver.patients.toLocaleString()}
+                  </p>
+                  <Link
+                    href={`/hospitals/${records.busiestEver.slug}`}
+                    className="text-xs text-stone-600 hover:text-teal-700 underline underline-offset-2 mt-1 block truncate"
+                  >
+                    {records.busiestEver.name}
+                  </Link>
+                  <p className="text-[11px] text-stone-400 mt-0.5">
+                    {fmtWhen(records.busiestEver.when)}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <p className="text-center text-xs text-stone-400 max-w-xl mx-auto">
           Every figure is recomputed from trust-published data each time the

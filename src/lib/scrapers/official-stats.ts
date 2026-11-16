@@ -236,9 +236,10 @@ export async function refreshEnglandMonthly(db: Database.Database): Promise<stri
   if (!snapshot) {
     return `England: no update (${notes.join("; ") || "no reason recorded"})`;
   }
-  if (storedPeriod(db, "trust") === snapshot.period) {
-    return `England: ${snapshot.period} (current, from snapshot)`;
-  }
+  // Always upsert from the snapshot (it's tens of rows, trivially cheap). A
+  // period check here would skip applying a snapshot whose *contents* changed
+  // under the same month — e.g. after fixing a trust's org code — leaving the
+  // stale set live in CI until the next month ticks over.
   let fromFile = 0;
   for (const [trustName, v] of Object.entries(snapshot.trusts)) {
     upsert(db, "trust", trustName, v.avgWaitMinutes, v.pctWithin4h, snapshot.period);
@@ -386,8 +387,132 @@ export async function refreshScotlandWeekly(db: Database.Database): Promise<stri
   }`;
 }
 
+// ---------- Wales: StatsWales monthly 4-hour performance ----------
+
+// Full long-format dataset (~16 MB) — "Emergency departments: performance
+// against waiting times targets". Site-level, monthly. StatsWales has no
+// stable public REST API yet, but this download id is deterministic.
+const WALES_CSV =
+  "https://stats.gov.wales/en-GB/3ce1cc28-0625-4674-89d6-9cf3a56f2d9c/download/kbxv33jarpm4";
+
+export const WALES_SNAPSHOT_PATH = "data/wales-monthly.json";
+
+// Dataset site name (with the " (Major)" suffix stripped, lower-cased) → our
+// hospital slug. Two use Welsh forms that don't name-match ours.
+const WALES_SITE_TO_SLUG: Record<string, string> = {
+  "wrexham maelor hospital": "wrexham-maelor-hospital",
+  "the grange university hospital": "the-grange-university-hospital",
+  "glangwili general hospital": "glangwili-general-hospital",
+  "prince charles hospital": "prince-charles-hospital",
+  "morriston hospital": "morriston-hospital",
+  "university hospital of wales": "university-hospital-of-wales",
+  "ysbyty gwynedd": "ysbyty-gwynedd",
+  "ysbyty glan clwyd": "glan-clwyd-hospital",
+};
+
+export interface WalesSnapshot {
+  period: string;
+  source: string;
+  hospitals: Record<string, { avgWaitMinutes: number; pctWithin4h: number }>;
+}
+
+/**
+ * Download and parse the StatsWales dataset into the latest 4-hour
+ * performance per Welsh major ED. The dataset gives "% seen within 4 hours",
+ * not a median, so the average wait is estimated from that percentage with
+ * the same two-band model used elsewhere (<4h ~90 min, >4h ~360 min).
+ */
+export async function fetchWalesMonthly(): Promise<WalesSnapshot | null> {
+  let body: string;
+  try {
+    const res = await fetchWithRetry(WALES_CSV, {
+      headers: { "User-Agent": UA, Accept: "text/csv,*/*" },
+    });
+    if (!res.ok) return null;
+    body = await res.text();
+  } catch {
+    return null;
+  }
+
+  const lines = body.split("\n");
+  const header = lines[0].split(",").map((h) => h.trim());
+  const iVal = header.indexOf("Data values");
+  const iDesc = header.indexOf("Data description");
+  const iDate = header.indexOf("Date");
+  const iDateSort = header.indexOf("Date_sort");
+  const iHosp = header.indexOf("Hospital");
+  const iHtypeRef = header.indexOf("Hospital Type_reference");
+  const iTarget = header.indexOf("Target");
+  if ([iVal, iDesc, iDate, iDateSort, iHosp, iHtypeRef, iTarget].some((i) => i < 0)) {
+    return null;
+  }
+
+  // Latest "% within 4 hours" per matched site.
+  const best = new Map<string, { sort: number; pct: number }>();
+  let latestSort = 0;
+  let latestPeriod = "";
+  for (let i = 1; i < lines.length; i++) {
+    const c = lines[i].split(",");
+    if (c.length <= iTarget) continue;
+    if (!/^Percentage/.test(c[iDesc])) continue;
+    if (c[iTarget] !== "4 hour target") continue;
+    if (c[iHtypeRef] !== "Major") continue;
+    const name = c[iHosp].replace(/\s*\(Major\)\s*$/, "").toLowerCase().trim();
+    const slug = WALES_SITE_TO_SLUG[name];
+    if (!slug) continue;
+    const sort = parseInt(c[iDateSort]);
+    const pct = parseFloat(c[iVal]);
+    if (!Number.isFinite(sort) || !Number.isFinite(pct)) continue;
+    const cur = best.get(slug);
+    if (!cur || sort > cur.sort) best.set(slug, { sort, pct });
+    if (sort > latestSort) {
+      latestSort = sort;
+      latestPeriod = c[iDate];
+    }
+  }
+  if (best.size === 0) return null;
+
+  const hospitals: WalesSnapshot["hospitals"] = {};
+  for (const [slug, v] of best) {
+    hospitals[slug] = {
+      avgWaitMinutes: Math.round((v.pct / 100) * 90 + (1 - v.pct / 100) * 360),
+      pctWithin4h: Math.round(v.pct * 10) / 10,
+    };
+  }
+  return { period: latestPeriod, source: WALES_CSV, hospitals };
+}
+
+function loadWalesSnapshot(): WalesSnapshot | null {
+  try {
+    const file = path.join(process.cwd(), WALES_SNAPSHOT_PATH);
+    if (!fs.existsSync(file)) return null;
+    return JSON.parse(fs.readFileSync(file, "utf-8")) as WalesSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Write Welsh estimates into typical_waits. Snapshot-first: the source is a
+ * 16 MB CSV, far too heavy to pull every 30-minute scrape, so the committed
+ * snapshot (refreshed monthly by scripts/refresh-wales-stats.ts) is the
+ * primary path and a live fetch is only a fallback when it's missing. The
+ * handful of rows are cheap to upsert every run, so there's no period skip.
+ */
+export async function refreshWalesMonthly(db: Database.Database): Promise<string> {
+  const snap = loadWalesSnapshot() ?? (await fetchWalesMonthly());
+  if (!snap) return "Wales: no data (no snapshot, live fetch failed)";
+  let updated = 0;
+  for (const [slug, v] of Object.entries(snap.hospitals)) {
+    upsert(db, "hospital", slug, v.avgWaitMinutes, v.pctWithin4h, snap.period);
+    updated++;
+  }
+  const src = loadWalesSnapshot() ? "snapshot" : "live";
+  return `Wales: ${snap.period}, ${updated} hospitals (${src})`;
+}
+
 export async function refreshOfficialStats(db: Database.Database): Promise<void> {
-  for (const job of [refreshEnglandMonthly, refreshScotlandWeekly]) {
+  for (const job of [refreshEnglandMonthly, refreshScotlandWeekly, refreshWalesMonthly]) {
     try {
       console.log(`  Official stats — ${await job(db)}`);
     } catch (err) {

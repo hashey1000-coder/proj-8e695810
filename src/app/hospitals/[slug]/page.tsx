@@ -17,7 +17,10 @@ import {
 } from "@/lib/utils";
 import { getHospitalImage } from "@/lib/hospital-images";
 import { getTypicalWait } from "@/lib/data/typical";
+import { getWeeklyPattern, getDailyTrend } from "@/lib/data/history";
 import { HospitalHistory } from "@/components/HospitalHistory";
+import { WeeklyHeatmap } from "@/components/WeeklyHeatmap";
+import { TrendChart } from "@/components/TrendChart";
 import { TimeAgo } from "@/components/TimeAgo";
 import type { Metadata } from "next";
 
@@ -65,6 +68,8 @@ export default async function HospitalDetailPage({
 
   const readings = getHospitalReadings(hospital.id, 24);
   const severity = waitSeverity(hospital.wait_minutes);
+  const weeklyPattern = getWeeklyPattern(hospital.id);
+  const waitTrend = getDailyTrend(hospital.id, 30);
 
   const allHospitals = getAllHospitalsWithWaits();
   const nationalAvg = getNationalStats().avgWait;
@@ -308,8 +313,8 @@ export default async function HospitalDetailPage({
               {hospital.country === "Wales" && (
                 <span className="text-slate-600">
                   {" "}
-                  (NHS Wales has withdrawn its live feed, so no current figure
-                  is available)
+                  (NHS Wales withdrew its live feed, so the figure above is a
+                  monthly estimate from StatsWales, not a live reading)
                 </span>
               )}
             </p>
@@ -435,6 +440,35 @@ export default async function HospitalDetailPage({
 
             {readings.length > 0 && (
               <HospitalHistory readings={readings} hospitalName={hospital.name} />
+            )}
+
+            {/* ===== Weekly "best time to go" pattern ===== */}
+            {weeklyPattern.sufficient && (
+              <div className="rounded-xl border border-stone-200 bg-white p-6">
+                <h2 className="text-lg font-extrabold text-stone-900 mb-1">
+                  The quietest times at {hospital.name}
+                </h2>
+                <p className="text-xs text-stone-400 mb-5">
+                  Average wait by day and hour, built from{" "}
+                  {weeklyPattern.coverageDays} days of our own readings. Teal is
+                  calmer than usual for this department, rose is busier.
+                </p>
+                <WeeklyHeatmap pattern={weeklyPattern} />
+              </div>
+            )}
+
+            {/* ===== 30-day wait trend ===== */}
+            {waitTrend.length >= 2 && (
+              <div className="rounded-xl border border-stone-200 bg-white p-6">
+                <h2 className="text-lg font-extrabold text-stone-900 mb-1">
+                  How the wait has moved
+                </h2>
+                <p className="text-xs text-stone-400 mb-5">
+                  Daily average wait over the last {waitTrend.length} days with a
+                  reading. Each point is the mean of that day&apos;s readings.
+                </p>
+                <TrendChart points={waitTrend} />
+              </div>
             )}
 
             {/* Context paragraph */}

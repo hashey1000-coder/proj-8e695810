@@ -20,7 +20,7 @@ INSERT OR IGNORE INTO trusts (id, name, slug, source_url, country) VALUES
   ('t-mtw', 'Maidstone and Tunbridge Wells NHS Trust', 'maidstone-and-tunbridge-wells-nhs-trust', 'https://www.mtw.nhs.uk/', 'England'),
   ('t-ulh', 'United Lincolnshire Teaching Hospitals NHS Trust', 'united-lincolnshire-teaching-hospitals-nhs-trust', 'https://www.ulh.nhs.uk/', 'England'),
   ('t-imperial', 'Imperial College Healthcare NHS Trust', 'imperial-college-healthcare-nhs-trust', 'https://www.imperial.nhs.uk/our-services/emergency-care', 'England'),
-  ('t-nbt', 'Bristol NHS Foundation Trust', 'bristol-nhs-foundation-trust', 'https://www.nbt.nhs.uk/our-services/a-z-services/emergency-department', 'England'),
+  ('t-nbt', 'North Bristol NHS Trust', 'north-bristol-nhs-trust', 'https://www.nbt.nhs.uk/our-services/a-z-services/emergency-department', 'England'),
   ('t-kch', 'King''s College Hospital NHS Foundation Trust', 'kings-college-hospital-nhs-foundation-trust', 'https://www.kch.nhs.uk/', 'England'),
   ('t-gstt', 'Guy''s and St Thomas'' NHS Foundation Trust', 'guys-and-st-thomas-nhs-foundation-trust', 'https://www.guysandstthomas.nhs.uk/', 'England'),
   ('t-uclh', 'University College London Hospitals NHS Foundation Trust', 'university-college-london-hospitals-nhs-foundation-trust', 'https://www.uclh.nhs.uk/', 'England'),

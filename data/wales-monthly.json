@@ -1,0 +1,38 @@
+{
+  "period": "September 2026",
+  "source": "https://stats.gov.wales/en-GB/3ce1cc28-0625-4674-89d6-9cf3a56f2d9c/download/kbxv33jarpm4",
+  "hospitals": {
+    "wrexham-maelor-hospital": {
+      "avgWaitMinutes": 269,
+      "pctWithin4h": 33.8
+    },
+    "glan-clwyd-hospital": {
+      "avgWaitMinutes": 266,
+      "pctWithin4h": 34.9
+    },
+    "ysbyty-gwynedd": {
+      "avgWaitMinutes": 206,
+      "pctWithin4h": 57
+    },
+    "glangwili-general-hospital": {
+      "avgWaitMinutes": 227,
+      "pctWithin4h": 49.1
+    },
+    "morriston-hospital": {
+      "avgWaitMinutes": 215,
+      "pctWithin4h": 53.8
+    },
+    "university-hospital-of-wales": {
+      "avgWaitMinutes": 207,
+      "pctWithin4h": 56.8
+    },
+    "prince-charles-hospital": {
+      "avgWaitMinutes": 215,
+      "pctWithin4h": 53.7
+    },
+    "the-grange-university-hospital": {
+      "avgWaitMinutes": 252,
+      "pctWithin4h": 40.1
+    }
+  }
+}

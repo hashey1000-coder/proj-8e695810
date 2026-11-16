@@ -2,6 +2,7 @@ import * as cheerio from "cheerio";
 import { getDb } from "../db";
 import { generateId, slugify } from "../utils";
 import { fetchWithRetry } from "./generic";
+import { validateReading } from "./validate";
 
 const SOURCE_URL =
   "https://www.nidirect.gov.uk/articles/emergency-department-waiting-times";
@@ -123,6 +124,11 @@ export async function scrapeNorthernIreland(): Promise<{
               ).run(hoursText, hospitalId, hoursText);
             }
 
+            const check = validateReading({ waitMinutes, patientsWaiting });
+            if (!check.ok) {
+              errors.push(`${name}: rejected ${check.reason}`);
+              return;
+            }
             db.prepare(
               `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, source_timestamp, freshness)
                VALUES (?, ?, ?, ?, datetime('now'), 'live')`
