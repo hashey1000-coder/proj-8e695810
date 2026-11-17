@@ -86,8 +86,7 @@ jobs:
           SSH_PORT="${CPANEL_SSH_PORT:-2239}"
 
           mkdir -p ~/.ssh
-          printf '%s
-' "$CPANEL_SSH_KEY" | tr -d '' > ~/.ssh/id_deploy
+          printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
 
           ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
