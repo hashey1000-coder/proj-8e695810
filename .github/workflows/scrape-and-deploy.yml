@@ -113,7 +113,13 @@ jobs:
       # files serially takes ~5 min even though the payload is only ~35 MB.
       # lftp mirrors with many concurrent transfers, cutting it to ~1 min.
       - name: Install lftp
-        run: command -v lftp >/dev/null || sudo apt-get install -y --no-install-recommends lftp
+        run: |
+          for i in 1 2 3; do
+            command -v lftp >/dev/null || sudo apt-get install -y --no-install-recommends lftp && break
+            echo "apt-get attempt $i/3 failed; retrying in 10s..." >&2
+            sleep 10
+          done
+          command -v lftp >/dev/null || { echo "lftp install failed after 3 attempts" >&2; exit 1; }
 
       - name: Deploy to cPanel
         env:
