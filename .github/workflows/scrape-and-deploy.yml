@@ -86,7 +86,8 @@ jobs:
           SSH_PORT="${CPANEL_SSH_PORT:-2239}"
 
           mkdir -p ~/.ssh
-          printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_deploy
+          printf '%s
+' "$CPANEL_SSH_KEY" | tr -d '' > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
 
           # ssh-keyscan occasionally times out reaching the cPanel host from
@@ -114,12 +115,12 @@ jobs:
       # lftp mirrors with many concurrent transfers, cutting it to ~1 min.
       - name: Install lftp
         run: |
-          for i in 1 2 3; do
+          for i in 1 2 3 4 5; do
             command -v lftp >/dev/null || sudo apt-get install -y --no-install-recommends lftp && break
-            echo "apt-get attempt $i/3 failed; retrying in 10s..." >&2
-            sleep 10
+            echo "apt-get attempt $i/3 failed; retrying in 30s..." >&2
+            sleep 30
           done
-          command -v lftp >/dev/null || { echo "lftp install failed after 3 attempts" >&2; exit 1; }
+          command -v lftp >/dev/null || { echo "lftp install failed after 5 attempts" >&2; exit 1; }
 
       - name: Deploy to cPanel
         env:
