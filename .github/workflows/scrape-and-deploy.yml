@@ -94,17 +94,17 @@ jobs:
           # doesn't fail the whole scrape+deploy — the scrape is already done
           # and cached by this point, so only the deploy would be lost.
           scanned=0
-          for attempt in 1 2 3 4; do
+          for attempt in 1 2 3 4 5; do
             if ssh-keyscan -T 20 -p "$SSH_PORT" -H "$CPANEL_HOST" > ~/.ssh/known_hosts.tmp 2>/dev/null && [ -s ~/.ssh/known_hosts.tmp ]; then
               mv ~/.ssh/known_hosts.tmp ~/.ssh/known_hosts
               scanned=1
               break
             fi
-            echo "ssh-keyscan attempt $attempt failed; retrying in $((attempt * 10))s"
-            sleep $((attempt * 10))
+            echo "ssh-keyscan attempt $attempt failed; retrying in 30s"
+            sleep 30
           done
           if [ "$scanned" != 1 ]; then
-            echo "ssh-keyscan could not reach $CPANEL_HOST:$SSH_PORT after 4 attempts" >&2
+            echo "ssh-keyscan could not reach $CPANEL_HOST:$SSH_PORT after 5 attempts" >&2
             exit 1
           fi
 
