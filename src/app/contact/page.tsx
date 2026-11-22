@@ -23,7 +23,7 @@ export default function ContactPage() {
       <p>
         <a
           href={CONTACT_MAILTO}
-          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-3 text-base font-bold text-white no-underline hover:bg-teal-700"
+          className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-5 py-3 text-base font-bold !text-white !no-underline hover:bg-teal-700"
         >
           {SITE.contactEmail}
         </a>
