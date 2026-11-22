@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrustBlock } from "@/components/TrustBlock";
 import {
   getNationalStats,
   getLongestWaits,
@@ -330,6 +331,8 @@ export default function StatisticsPage() {
           .
         </p>
       </div>
+
+      <TrustBlock />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrustBlock } from "@/components/TrustBlock";
 import { notFound } from "next/navigation";
 import {
   getHospitalsByRegion,
@@ -72,6 +73,7 @@ export default async function RegionPage({
   });
 
   return (
+    <>
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
       <nav className="text-xs font-semibold text-stone-400 mb-4 uppercase tracking-wide">
         <Link href="/" className="hover:text-teal-700">Home</Link>
@@ -123,5 +125,7 @@ export default async function RegionPage({
         usual wait where we have one instead of pretending it&apos;s live.
       </p>
     </div>
+      <TrustBlock />
+    </>
   );
 }

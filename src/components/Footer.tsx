@@ -30,6 +30,15 @@ const FOOTER_COLS: { heading: string; links: { label: string; href: string }[] }
       { label: "Questions & answers", href: "/faq" },
     ],
   },
+  {
+    heading: "About",
+    links: [
+      { label: "About us", href: "/about" },
+      { label: "Editorial policy", href: "/editorial-policy" },
+      { label: "Methodology", href: "/methodology" },
+      { label: "Contact", href: "/contact" },
+    ],
+  },
 ];
 
 export function Footer() {
@@ -57,7 +66,7 @@ export function Footer() {
       </div>
 
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="py-14 grid grid-cols-2 md:grid-cols-5 gap-10">
+        <div className="py-14 grid grid-cols-2 md:grid-cols-6 gap-10">
           <div className="col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-teal-600">
@@ -104,6 +113,15 @@ export function Footer() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="py-5 border-t border-slate-800/80 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
+          <Link href="/about" className="text-slate-400 hover:text-teal-400 transition-colors">About</Link>
+          <Link href="/methodology" className="text-slate-400 hover:text-teal-400 transition-colors">Methodology</Link>
+          <Link href="/data-sources" className="text-slate-400 hover:text-teal-400 transition-colors">Data sources</Link>
+          <Link href="/editorial-policy" className="text-slate-400 hover:text-teal-400 transition-colors">Editorial policy</Link>
+          <Link href="/medical-disclaimer" className="text-slate-400 hover:text-teal-400 transition-colors">Medical disclaimer</Link>
+          <Link href="/contact" className="text-slate-400 hover:text-teal-400 transition-colors">Contact</Link>
         </div>
 
         <div className="py-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TrustBlock } from "@/components/TrustBlock";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
@@ -652,6 +653,8 @@ export default async function HospitalDetailPage({
           </div>
         </div>
       </div>
+
+      <TrustBlock />
     </div>
   );
 }

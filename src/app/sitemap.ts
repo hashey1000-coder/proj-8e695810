@@ -16,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/statistics/`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: `${baseUrl}/guides/`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/faq/`, lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/about/`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/methodology/`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/data-sources/`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/editorial-policy/`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${baseUrl}/medical-disclaimer/`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${baseUrl}/contact/`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
   ];
 
   const hospitals = getAllHospitalsWithWaits();
