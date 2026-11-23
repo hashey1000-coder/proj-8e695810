@@ -18,7 +18,8 @@ import {
 } from "@/lib/utils";
 import { getHospitalImage } from "@/lib/hospital-images";
 import { getTypicalWait } from "@/lib/data/typical";
-import { getWeeklyPattern, getDailyTrend } from "@/lib/data/history";
+import { getWeeklyPattern, getDailyTrend, DAY_LABELS } from "@/lib/data/history";
+import type { WeeklyPattern, TrendPoint } from "@/lib/data/history";
 import { HospitalHistory } from "@/components/HospitalHistory";
 import { WeeklyHeatmap } from "@/components/WeeklyHeatmap";
 import { TrendChart } from "@/components/TrendChart";
@@ -74,6 +75,14 @@ export default async function HospitalDetailPage({
 
   const allHospitals = getAllHospitalsWithWaits();
   const nationalAvg = getNationalStats().avgWait;
+  const typicalWait = getTypicalWait(slug, hospital.trust_name);
+  const summary = buildHospitalSummary(
+    hospital,
+    weeklyPattern,
+    waitTrend,
+    nationalAvg,
+    typicalWait
+  );
   // Nearest departments by distance, capped at 100 km so a hospital in a
   // sparse area never recommends "alternatives" hundreds of kilometres away.
   // Hospitals without live data still appear — a real A&E 40 km away is a
@@ -322,6 +331,19 @@ export default async function HospitalDetailPage({
           )}
         </div>
       </section>
+
+      {summary.length > 0 && (
+        <section className="border-b border-stone-200 bg-white">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-7">
+            <h2 className="sr-only">At a glance</h2>
+            <div className="max-w-3xl space-y-2.5 text-stone-600 leading-relaxed">
+              {summary.map((s, i) => (
+                <p key={i}>{s}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -657,6 +679,97 @@ export default async function HospitalDetailPage({
       <TrustBlock />
     </div>
   );
+}
+
+function slotLabel(day: number, hour: number): string {
+  const h = hour % 12 === 0 ? 12 : hour % 12;
+  const ap = hour < 12 ? "am" : "pm";
+  return `${DAY_LABELS[day]} around ${h}${ap}`;
+}
+
+/**
+ * A short, genuinely per-hospital summary written from this department's OWN
+ * numbers — current reading vs the UK average, its recent daily trend, and its
+ * calmest/busiest window. Every sentence is computed from real data and gated
+ * on there being enough of it, so no page claims more than it can support.
+ */
+function buildHospitalSummary(
+  h: { name: string; type: string; wait_minutes: number | null; avg_wait: number | null },
+  weeklyPattern: WeeklyPattern,
+  waitTrend: TrendPoint[],
+  nationalAvg: number,
+  typical: { avgWaitMinutes: number; pctWithin4h: number; period: string } | null
+): string[] {
+  const out: string[] = [];
+  const dept = h.type === "AE" ? "A&E" : deptLabel(h.type);
+
+  if (h.wait_minutes !== null) {
+    const sev = severityLabel(waitSeverity(h.wait_minutes)).toLowerCase();
+    let s = `At the last reading, ${h.name} was reporting a wait of about ${formatWaitTime(
+      h.wait_minutes
+    )} — ${sev} on our scale`;
+    if (nationalAvg > 0) {
+      const diff = h.wait_minutes - nationalAvg;
+      if (Math.abs(diff) >= 20) {
+        s += `, roughly ${formatWaitTime(Math.abs(diff))} ${
+          diff < 0 ? "shorter" : "longer"
+        } than the UK average of ${formatWaitTime(nationalAvg)} right now`;
+      } else {
+        s += `, in line with the UK average of about ${formatWaitTime(nationalAvg)}`;
+      }
+    }
+    out.push(s + ".");
+  } else if (h.avg_wait !== null) {
+    out.push(
+      `${h.name} isn't publishing a live waiting figure right now; the usual wait here runs around ${formatWaitTime(
+        h.avg_wait
+      )}, and the figures below draw on the most recent data we hold.`
+    );
+  } else if (typical) {
+    out.push(
+      `${h.name} isn't publishing a live waiting figure right now. Official statistics put the typical wait here at around ${formatWaitTime(
+        typical.avgWaitMinutes
+      )}, with ${typical.pctWithin4h}% of patients seen inside four hours (${typical.period}) — the figures below use that estimate alongside the most recent data we hold.`
+    );
+  } else {
+    out.push(
+      `${h.name} isn't publishing a live waiting figure at the moment, and we don't yet have an official estimate for it — so it's worth checking back after the next data run, or calling ahead if timing matters.`
+    );
+  }
+
+  if (waitTrend.length >= 5) {
+    const vals = waitTrend.map((p) => p.avgWait);
+    const mean = Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+    const n = Math.max(1, Math.floor(vals.length / 3));
+    const first = vals.slice(0, n).reduce((a, b) => a + b, 0) / n;
+    const last = vals.slice(-n).reduce((a, b) => a + b, 0) / n;
+    const delta = last - first;
+    const dir =
+      Math.abs(delta) < 15
+        ? "holding fairly steady"
+        : delta < 0
+          ? "easing lower"
+          : "creeping up";
+    out.push(
+      `Across the last ${waitTrend.length} days its daily average has run around ${formatWaitTime(
+        mean
+      )}, ${dir}.`
+    );
+  }
+
+  if (weeklyPattern.sufficient && weeklyPattern.quietest && weeklyPattern.busiest) {
+    out.push(
+      `From the readings we've gathered, this ${dept} is usually calmest ${slotLabel(
+        weeklyPattern.quietest.day,
+        weeklyPattern.quietest.hour
+      )} and under most pressure ${slotLabel(
+        weeklyPattern.busiest.day,
+        weeklyPattern.busiest.hour
+      )} — worth knowing if your visit can wait for a quieter window.`
+    );
+  }
+
+  return out;
 }
 
 function buildLocalFaqs(hospital: {
