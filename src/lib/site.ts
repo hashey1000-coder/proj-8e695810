@@ -14,6 +14,12 @@ export const SITE = {
   // Content-review date shown in the trust block and on editorial pages.
   // This is an editorial review date, not the live-data update time.
   lastReviewed: "22 November 2026",
+  // Effective date for the legal pages (privacy, cookies, terms). Bump this
+  // whenever those documents materially change.
+  legalUpdated: "23 November 2026",
+  // Google Analytics 4 measurement ID (kept here so the privacy/cookie
+  // copy and the Analytics component stay in step).
+  analyticsId: "G-FF6T6W000G",
 } as const;
 
 export const CONTACT_MAILTO = `mailto:${SITE.contactEmail}`;

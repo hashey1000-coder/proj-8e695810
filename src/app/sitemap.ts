@@ -22,6 +22,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/editorial-policy/`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: `${baseUrl}/medical-disclaimer/`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
     { url: `${baseUrl}/contact/`, lastModified: now, changeFrequency: "monthly", priority: 0.4 },
+    { url: `${baseUrl}/privacy/`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/cookies/`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${baseUrl}/terms/`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
   const hospitals = getAllHospitalsWithWaits();

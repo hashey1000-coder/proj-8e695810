@@ -121,6 +121,9 @@ export function Footer() {
           <Link href="/data-sources" className="text-slate-400 hover:text-teal-400 transition-colors">Data sources</Link>
           <Link href="/editorial-policy" className="text-slate-400 hover:text-teal-400 transition-colors">Editorial policy</Link>
           <Link href="/medical-disclaimer" className="text-slate-400 hover:text-teal-400 transition-colors">Medical disclaimer</Link>
+          <Link href="/privacy" className="text-slate-400 hover:text-teal-400 transition-colors">Privacy</Link>
+          <Link href="/cookies" className="text-slate-400 hover:text-teal-400 transition-colors">Cookies</Link>
+          <Link href="/terms" className="text-slate-400 hover:text-teal-400 transition-colors">Terms</Link>
           <Link href="/contact" className="text-slate-400 hover:text-teal-400 transition-colors">Contact</Link>
         </div>
 
